@@ -390,8 +390,8 @@ function OnDueDateToggle({
     <div
       className="p-4 rounded-xl h-full flex flex-col"
       style={{
-        background: checked ? "#303030" : "#F0F0F0",
-        border: `1px solid ${checked ? "#E00010" : "#D0D0D0"}`,
+        background: checked ? "#FFFFFF" : "#F0F0F0",
+        border: `2px solid ${checked ? "#E00010" : "#D0D0D0"}`,
         transition: "background 0.25s, border-color 0.25s",
       }}
     >
@@ -405,7 +405,7 @@ function OnDueDateToggle({
         </div>
         <span
           className="text-xs font-semibold"
-          style={{ color: checked ? "#F0F0F0" : "#404040" }}
+          style={{ color: checked ? "#303030" : "#404040" }}
         >
           On Due Date
         </span>
@@ -464,7 +464,7 @@ function OnDueDateToggle({
 
       <p
         className="text-[11px] mt-auto"
-        style={{ color: checked ? "#C0C0C0" : "#909090" }}
+        style={{ color: checked ? "#404040" : "#909090" }}
       >
         Alert on the exact deadline day
       </p>
@@ -688,13 +688,13 @@ export function SLASettings() {
                 {/* Before Due */}
                 <div
                   className="p-4 rounded-xl"
-                  style={{ background: "#F0F0F0", border: "1px solid #D0D0D0" }}
+                  style={{ background: "#FFFFFF", border: "2px solid #303030" }}
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center justify-center w-7 h-7 rounded-lg" style={{ background: "#E0E0E0" }}>
-                      <Clock className="w-3.5 h-3.5" style={{ color: "#505050" }} />
+                    <div className="flex items-center justify-center w-7 h-7 rounded-lg" style={{ background: "#303030" }}>
+                      <Clock className="w-3.5 h-3.5" style={{ color: "#FFFFFF" }} />
                     </div>
-                    <span className="text-xs font-semibold" style={{ color: "#404040" }}>Before Due Date</span>
+                    <span className="text-sm font-semibold" style={{ color: "#404040" }}>Before Due Date</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <input
@@ -715,7 +715,7 @@ export function SLASettings() {
                     />
                     <span className="text-xs font-medium" style={{ color: "#707070" }}>days prior</span>
                   </div>
-                  <p className="text-[11px] mt-2" style={{ color: "#909090" }}>Send early reminder to assignee</p>
+                  <p className="text-[11px] mt-2" style={{ color: "#303030" }}>Send early reminder to assignee</p>
                 </div>
 
                 {/* On Due Date — improved toggle card */}
@@ -727,13 +727,13 @@ export function SLASettings() {
                 {/* After Due */}
                 <div
                   className="p-4 rounded-xl"
-                  style={{ background: "#F0F0F0", border: "1px solid #D0D0D0" }}
+                  style={{ background: "#FFFFFF", border: "2px solid #303030" }}
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center justify-center w-7 h-7 rounded-lg" style={{ background: "#E0E0E0" }}>
-                      <AlertCircle className="w-3.5 h-3.5" style={{ color: "#505050" }} />
+                    <div className="flex items-center justify-center w-7 h-7 rounded-lg" style={{ background: "#303030"}}>
+                      <AlertCircle className="w-3.5 h-3.5" style={{ color: "#FFFFFF" }} />
                     </div>
-                    <span className="text-xs font-semibold" style={{ color: "#404040" }}>After Due Date</span>
+                    <span className="text-sm font-semibold" style={{ color: "#303030" }}>After Due Date</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <input
@@ -837,8 +837,8 @@ export function SLASettings() {
                     key={sla.label}
                     className="p-4 rounded-xl"
                     style={{
-                      background: "#F0F0F0",
-                      border: "1px solid #D0D0D0",
+                      background: "#FFFFFF",
+                      border: "2px solid #D0D0D0",
                     }}
                   >
                     <div className="flex items-center gap-1.5 mb-3">

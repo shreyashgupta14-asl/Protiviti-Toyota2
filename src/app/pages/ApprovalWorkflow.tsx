@@ -16,7 +16,7 @@ interface ApprovalItem {
 const mockApprovals: ApprovalItem[] = [
   {
     id: "1",
-    controlId: "CTL-2026-002",
+    controlId: "A11-01",
     description: "Quarterly financial reconciliation and variance analysis",
     submittedBy: "Sarah Johnson",
     submittedDate: "2026-02-06",
@@ -26,7 +26,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "2",
-    controlId: "CTL-2026-003",
+    controlId: "B11-01",
     description: "Vendor payment authorization and approval workflow",
     submittedBy: "Michael Chen",
     submittedDate: "2026-02-05",
@@ -36,7 +36,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "3",
-    controlId: "CTL-2026-005",
+    controlId: "B11-02",
     description: "Data backup verification and disaster recovery testing",
     submittedBy: "David Wilson",
     submittedDate: "2026-02-04",
@@ -46,7 +46,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "4",
-    controlId: "CTL-2026-001",
+    controlId: "B11-03",
     description: "Review and validate user access permissions for critical systems",
     submittedBy: "John Smith",
     submittedDate: "2026-02-03",
@@ -56,7 +56,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "5",
-    controlId: "CTL-2026-007",
+    controlId: "C11-01",
     description: "Security patch deployment verification for production servers",
     submittedBy: "Emily Rodriguez",
     submittedDate: "2026-02-10",
@@ -66,7 +66,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "6",
-    controlId: "CTL-2026-008",
+    controlId: "C11-02",
     description: "Compliance audit preparation and documentation review",
     submittedBy: "James Anderson",
     submittedDate: "2026-02-09",
@@ -76,7 +76,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "7",
-    controlId: "CTL-2026-010",
+    controlId: "D12-01",
     description: "IT asset inventory reconciliation and validation",
     submittedBy: "Lisa Martinez",
     submittedDate: "2026-02-08",
@@ -86,7 +86,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "8",
-    controlId: "CTL-2026-012",
+    controlId: "D12-02",
     description: "Network security assessment and vulnerability scan results",
     submittedBy: "Robert Taylor",
     submittedDate: "2026-02-07",
@@ -96,7 +96,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "9",
-    controlId: "CTL-2026-014",
+    controlId: "F11-01",
     description: "Employee onboarding access provisioning review",
     submittedBy: "Jennifer Lee",
     submittedDate: "2026-02-06",
@@ -106,7 +106,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "10",
-    controlId: "CTL-2026-015",
+    controlId: "F11-02",
     description: "Database backup integrity verification and restoration test",
     submittedBy: "Christopher Brown",
     submittedDate: "2026-02-05",
@@ -116,7 +116,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "11",
-    controlId: "CTL-2026-018",
+    controlId: "A11-01",
     description: "Segregation of duties conflict analysis for financial systems",
     submittedBy: "Amanda White",
     submittedDate: "2026-02-04",
@@ -126,7 +126,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "12",
-    controlId: "CTL-2026-019",
+    controlId: "B11-01",
     description: "Third-party vendor risk assessment and due diligence",
     submittedBy: "Daniel Garcia",
     submittedDate: "2026-02-03",
@@ -136,7 +136,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "13",
-    controlId: "CTL-2026-021",
+    controlId: "C11-01",
     description: "Password policy compliance audit and remediation",
     submittedBy: "Michelle Thompson",
     submittedDate: "2026-02-02",
@@ -146,7 +146,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "14",
-    controlId: "CTL-2026-023",
+    controlId: "D12-01",
     description: "Change management approval workflow for production systems",
     submittedBy: "Kevin Martinez",
     submittedDate: "2026-02-01",
@@ -156,7 +156,7 @@ const mockApprovals: ApprovalItem[] = [
   },
   {
     id: "15",
-    controlId: "CTL-2026-025",
+    controlId: "F11-01",
     description: "Privileged access review for system administrators",
     submittedBy: "Nicole Davis",
     submittedDate: "2026-01-31",
@@ -165,6 +165,52 @@ const mockApprovals: ApprovalItem[] = [
     priority: "Medium",
   },
 ];
+
+// Wave SVG matching the reference — stroke line + soft filled area beneath
+function KpiWave({ color }: { color: string }) {
+  return (
+    <svg
+      className="absolute bottom-0 left-0 w-full"
+      viewBox="0 0 300 56"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ height: "56px" }}
+    >
+      <defs>
+        <linearGradient id={`waveGrad-${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.22" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.04" />
+        </linearGradient>
+      </defs>
+
+      {/* Filled area beneath the wave line */}
+      <path
+        d="M0 32 C20 22, 38 42, 60 30 C78 20, 95 38, 115 28 C135 18, 152 40, 175 28 C195 18, 215 38, 238 26 C258 16, 278 36, 300 24 L300 56 L0 56 Z"
+        fill={`url(#waveGrad-${color.replace("#", "")})`}
+      />
+
+      {/* Back wave line — thinner, more transparent */}
+      <path
+        d="M0 36 C20 26, 38 46, 60 34 C78 24, 95 42, 115 32 C135 22, 152 44, 175 32 C195 22, 215 42, 238 30 C258 20, 278 40, 300 28"
+        fill="none"
+        stroke={color}
+        strokeWidth="1.2"
+        strokeOpacity="0.25"
+        strokeLinecap="round"
+      />
+
+      {/* Front wave line — bolder, matches reference style */}
+      <path
+        d="M0 32 C20 22, 38 42, 60 30 C78 20, 95 38, 115 28 C135 18, 152 40, 175 28 C195 18, 215 38, 238 26 C258 16, 278 36, 300 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeOpacity="0.55"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export function ApprovalWorkflow() {
   const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
@@ -175,42 +221,35 @@ export function ApprovalWorkflow() {
       case "High":
         return "bg-red-100 text-red-700 border-red-300";
       case "Medium":
-        return "bg-orange-100 text-orange-700 border-orange-300";
+        return "bg-yellow-100 text-yellow-700 border-yellow-300";
       case "Low":
-        return "bg-blue-100 text-blue-700 border-blue-300";
+        return "bg-gray-100 text-gray-600 border-gray-300";
     }
   };
 
   return (
     <div className="h-screen flex flex-col p-4 sm:p-6 gap-4 overflow-hidden">
-      {/* Header - Enhanced with gradient */}
-      {/* <div className="bg-white rounded-xl shadow-md p-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64  rounded-full blur-3xl" />
-        <div className="relative z-10">
-          <h1 className="text-2xl sm:text-2xl font-bold text-gray-700 mb-1">Approval Workflow</h1>
-          <p className="text-sm text-gray-600">
-            Multi-level approval queue for control testing results
-          </p>
-        </div>
-      </div> */}
-
-      {/* Approval Queue Stats - Enhanced */}
+      {/* Approval Queue Stats - Enhanced with waves */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl shadow-md p-5 border-l-4 border-orange-500 hover:shadow-lg transition-all">
-          <p className="text-xs font-semibold text-orange-700 mb-1">Pending L1</p>
-          <p className="text-3xl font-bold text-orange-800">12</p>
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl shadow-md p-5 border-l-4 border-orange-500 hover:shadow-lg transition-all relative overflow-hidden">
+          <p className="text-xs font-semibold text-orange-700 mb-1 relative z-10">Pending L1</p>
+          <p className="text-3xl font-bold text-orange-800 relative z-10">12</p>
+          <KpiWave color="#f97316" />
         </div>
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md p-5 border-l-4 border-blue-500 hover:shadow-lg transition-all">
-          <p className="text-xs font-semibold text-blue-700 mb-1">Pending L2</p>
-          <p className="text-3xl font-bold text-blue-800">8</p>
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md p-5 border-l-4 border-blue-500 hover:shadow-lg transition-all relative overflow-hidden">
+          <p className="text-xs font-semibold text-blue-700 mb-1 relative z-10">Pending L2</p>
+          <p className="text-3xl font-bold text-blue-800 relative z-10">8</p>
+          <KpiWave color="#3b82f6" />
         </div>
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md p-5 border-l-4 border-purple-500 hover:shadow-lg transition-all">
-          <p className="text-xs font-semibold text-purple-700 mb-1">Pending L3</p>
-          <p className="text-3xl font-bold text-purple-800">5</p>
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md p-5 border-l-4 border-purple-500 hover:shadow-lg transition-all relative overflow-hidden">
+          <p className="text-xs font-semibold text-purple-700 mb-1 relative z-10">Pending L3</p>
+          <p className="text-3xl font-bold text-purple-800 relative z-10">5</p>
+          <KpiWave color="#a855f7" />
         </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-5 border-l-4 border-green-500 hover:shadow-lg transition-all">
-          <p className="text-xs font-semibold text-green-700 mb-1">Approved Today</p>
-          <p className="text-3xl font-bold text-green-800">14</p>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-5 border-l-4 border-green-500 hover:shadow-lg transition-all relative overflow-hidden">
+          <p className="text-xs font-semibold text-green-700 mb-1 relative z-10">Approved Today</p>
+          <p className="text-3xl font-bold text-green-800 relative z-10">14</p>
+          <KpiWave color="#22c55e" />
         </div>
       </div>
 
@@ -301,7 +340,7 @@ export function ApprovalWorkflow() {
                         className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm ${
                           item.currentLevel >= 2
                             ? item.status === "Pending"
-                              ? "bg-blue-500 text-white"
+                              ? "bg-gray-300 text-gray-600"
                               : "bg-green-500 text-white"
                             : "bg-gray-300 text-gray-600"
                         }`}
@@ -312,7 +351,7 @@ export function ApprovalWorkflow() {
                         className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm ${
                           item.currentLevel >= 3
                             ? item.status === "Pending"
-                              ? "bg-blue-500 text-white"
+                              ? "bg-gray-300 text-gray-600"
                               : "bg-green-500 text-white"
                             : "bg-gray-300 text-gray-600"
                         }`}
@@ -337,7 +376,7 @@ export function ApprovalWorkflow() {
                           ? "bg-green-100 text-green-700 border-green-300"
                           : item.status === "Rejected"
                           ? "bg-red-100 text-red-700 border-red-300"
-                          : "bg-orange-100 text-orange-700 border-orange-300"
+                          : "bg-yellow-100 text-yellow-700 border-yellow-300"
                       }`}
                     >
                       {item.status}
@@ -350,7 +389,7 @@ export function ApprovalWorkflow() {
                         className="p-2 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-200"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Eye className="w-4 h-4 text-blue-600" />
+                        <Eye className="w-4 h-4 text-gray-500" />
                       </Link>
                     </div>
                   </td>

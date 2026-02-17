@@ -328,7 +328,7 @@ export function Dashboard() {
 
       {/* Controls Table */}
       <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col flex-1 min-h-0">
-        <div className="p-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex-shrink-0">
+        <div className="p-5 rounded-t-xl border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex-shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h2 className="text-sm font-bold text-gray-800">Controls</h2>
@@ -349,7 +349,7 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="overflow-auto flex-1 min-h-0">
+        <div className="overflow-auto flex-1 min-h-0 rounded-xl">
           <table className="w-full min-w-[1100px]">
             <thead className="bg-gradient-to-r from-gray-100 to-gray-50 border-b border-gray-200 sticky top-0 z-10">
               <tr>

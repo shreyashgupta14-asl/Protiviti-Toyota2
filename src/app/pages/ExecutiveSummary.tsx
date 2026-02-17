@@ -249,8 +249,8 @@ export function ExecutiveSummary() {
                     ]}
                     cx="50%"
                     cy="50%"
-                    innerRadius="35%"
-                    outerRadius="58%"
+                    innerRadius="42%"
+                    outerRadius="72%"
                     paddingAngle={2}
                     dataKey="value"
                   >

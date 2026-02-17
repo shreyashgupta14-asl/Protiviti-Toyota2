@@ -502,7 +502,7 @@ export function ControlDetail() {
                   { value: "exception-2", label: "Exception 2" },
                   { value: "exception-3", label: "Exception 3" },
                   { value: "approval", label: "Approval" },
-                  { value: "audit", label: "Audit" },
+                  { value: "logs", label: "Logs" },
                 ].map((tab) => (
                   <Tabs.Trigger
                     key={tab.value}
@@ -1212,8 +1212,8 @@ export function ControlDetail() {
                 </div>
               </Tabs.Content>
 
-              {/* Audit Tab */}
-              <Tabs.Content value="audit" className="p-4">
+              {/* Logs Tab */}
+              <Tabs.Content value="logs" className="p-4">
                 <div className="space-y-2">
                   {auditEntries.map((entry) => (
                     <button
@@ -1240,7 +1240,7 @@ export function ControlDetail() {
         </div>
       </div>
 
-      {/* Audit Detail Modal */}
+      {/* Logs Detail Modal */}
       {selectedAudit && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
@@ -1250,7 +1250,7 @@ export function ControlDetail() {
                   <History className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">Audit Log Details</h2>
+                  <h2 className="text-lg font-bold text-white">Logs Details</h2>
                   <p className="text-xs text-white mt-0.5">ID: AUD-{selectedAudit.id.toString().padStart(6, '0')}</p>
                 </div>
               </div>
