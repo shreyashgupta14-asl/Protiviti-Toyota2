@@ -93,7 +93,7 @@ export function MainLayout() {
           </div>
           <div>
             <h1 className="text-sm font-bold text-gray-800">
-              CAGM System
+              CAGM
             </h1>
             <p className="text-xs text-gray-400">
               Compliance & Gov. Monitoring Tool

@@ -45,7 +45,7 @@ export function Login() {
   const passwordActive = passwordFocused || credentials.password !== "";
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden flex items-center justify-end pr-16">
+    <div className="relative h-screen w-screen overflow-hidden flex items-center justify-end pr-48">
       {/* ── VIDEO BACKGROUND ── */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
@@ -61,23 +61,25 @@ export function Login() {
       <div className="absolute inset-0 bg-red-800/50" />
 
       {/* ── LEFT BRANDING ── */}
-      <div className="absolute left-16 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center text-white select-none">
+      <div className="absolute left-16 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center text-white select-none ml-48">
         <img
           src={toyotaLogo}
           alt="Toyota Logo"
-          className="w-64 h-64 object-contain mb-4 drop-shadow-2xl"
+          className="w-64 h-64 object-contain mb-2 drop-shadow-2xl"
           // style={{ filter: "brightness(0) invert(1)" }}
         />
-         <h1 className="text-5xl font-extrabold leading-tight drop-shadow-lg text-center">
-          CAGM System
+        <div className="mb-24">
+          <h1 className="text-7xl font-bold leading-tight drop-shadow-lg text-center">
+          CAGM
         </h1>
-        <p className="mt-3 text-base font-medium text-white/90 drop-shadow text-center">
+        <p className="mt-3 text-xl font-medium text-white/90 drop-shadow text-center">
           Compliance and Governance Monitoring Tool
         </p>
+        </div>
       </div>
 
       {/* ── LOGIN CARD ── */}
-      <div className="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-[460px] px-11 py-12 mr-4">
+      <div className="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-[460px] px-11 py-12 ">
         {/* Header */}
         <h2 className="text-4xl font-extrabold text-[#CC0000] text-center mb-1 tracking-tight">
           Welcome

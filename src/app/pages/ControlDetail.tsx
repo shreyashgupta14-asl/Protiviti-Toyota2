@@ -142,9 +142,9 @@ export function ControlDetail() {
   ];
 
   // Validation
-  const validateField = (name: string, value: string) => {
+  const validateField = (name: string, value: string): string => {
     if (!value) return "";
-    
+
     const numValue = parseInt(value) || 0;
     const populationNum = parseInt(testData.populationCount) || 0;
     const sampleNum = parseInt(testData.sampleCount) || 0;
@@ -172,21 +172,21 @@ export function ControlDetail() {
     return "";
   };
 
-  const calculatePassPercentage = (pass: string, sample: string) => {
+  const calculatePassPercentage = (pass: string, sample: string): string => {
     const passNum = parseInt(pass) || 0;
     const sampleNum = parseInt(sample) || 0;
     if (sampleNum === 0) return "0.0";
     return ((passNum / sampleNum) * 100).toFixed(1);
   };
 
-  const calculateFailureRate = (fail: string, sample: string) => {
+  const calculateFailureRate = (fail: string, sample: string): string => {
     const failNum = parseInt(fail) || 0;
     const sampleNum = parseInt(sample) || 0;
     if (sampleNum === 0) return "0.0";
     return ((failNum / sampleNum) * 100).toFixed(1);
   };
 
-  const handleInputChange = (name: string, value: string) => {
+  const handleInputChange = (name: string, value: string): void => {
     // Only allow digits
     if (value && !/^\d*$/.test(value)) return;
 
@@ -224,9 +224,9 @@ export function ControlDetail() {
     setErrors({ ...errors, [name]: error });
   };
 
-  const handleBlur = (name: string) => {
+  const handleBlur = (name: string): void => {
     setTouched({ ...touched, [name]: true });
-    
+
     // Validate all related fields when one is blurred
     const newErrors = { ...errors };
     if (name === "populationCount" || name === "sampleCount") {
@@ -240,14 +240,14 @@ export function ControlDetail() {
     setErrors(newErrors);
   };
 
-  const isFormValid =
-    testData.populationCount &&
-    testData.sampleCount &&
+  const isFormValid: boolean =
+    !!testData.populationCount &&
+    !!testData.sampleCount &&
     testData.passCount !== "" &&
     testData.failCount !== "" &&
     Object.values(errors).every((e) => !e);
 
-  const filledFields = [
+  const filledFields: number = [
     testData.populationCount,
     testData.sampleCount,
     testData.passCount !== "",
@@ -273,7 +273,7 @@ export function ControlDetail() {
               <p className="text-xs text-gray-500">CTL-2026-{id}</p>
             </div>
           </div>
-          <button className="px-6 py-3 mt-2 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1.5">
+          <button className="px-6 py-3 mt-2 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 transition-colors flex items-center gap-1.5">
             <Save className="w-4 h-4" />
             Save
           </button>
@@ -288,11 +288,11 @@ export function ControlDetail() {
             {/* Premium Header with Gradient */}
             <button
               onClick={() => setShowControlInfo(!showControlInfo)}
-              className="w-full bg-gradient-to-br from-red-600 to-red-800 0 px-5 py-3.5 text-white flex items-center justify-between transition-all group relative overflow-hidden"
+              className="w-full bg-gradient-to-br from-red-600 to-red-800 px-5 py-3.5 text-white flex items-center justify-between transition-all group relative overflow-hidden"
             >
               {/* Animated background effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              
+
               <div className="flex items-center gap-3 relative z-10">
                 <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                   <Shield className="w-5 h-5" />
@@ -321,139 +321,147 @@ export function ControlDetail() {
                 {/* Top Stats Cards */}
                 <div className="grid grid-cols-4 gap-3 mb-4">
                   {/* Control ID Card */}
-                  <div className="bg-white rounded-lg p-3 border-l-4 border-red-600 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="bg-white rounded-lg p-3 border-l-4 border-gray-700 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="p-1.5 bg-red-100 rounded">
-                        <FileText className="w-3.5 h-3.5 text-red-600" />
+                      <div className="p-1.5 bg-gray-100 rounded">
+                        <FileText className="w-3.5 h-3.5 text-gray-700" />
                       </div>
-                      <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
                         Control ID
                       </label>
                     </div>
-                    <p className="text-sm font-bold text-red-600 ml-7">
+                    <p className="text-sm font-bold text-gray-700 ml-7">
                       {control ? control.controlId : `P-${id}`}
                     </p>
                   </div>
 
                   {/* Department Card */}
-                  <div className="bg-white rounded-lg p-3 border-l-4 border-cyan-500 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="bg-white rounded-lg p-3 border-l-4 border-gray-700 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="p-1.5 bg-cyan-100 rounded">
-                        <Calendar className="w-3.5 h-3.5 text-cyan-600" />
+                      <div className="p-1.5 bg-gray-100 rounded">
+                        <Calendar className="w-3.5 h-3.5 text-gray-700" />
                       </div>
-                      <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
                         Department
                       </label>
                     </div>
-                    <p className="text-sm font-bold text-cyan-600 ml-7">
+                    <p className="text-sm font-bold text-gray-700 ml-7">
                       {control ? control.department : "—"}
                     </p>
                   </div>
 
                   {/* Process / Area Card */}
-                  <div className="bg-white rounded-lg p-3 border-l-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="bg-white rounded-lg p-3 border-l-4 border-gray-700 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="p-1.5 bg-purple-100 rounded">
-                        <Target className="w-3.5 h-3.5 text-purple-600" />
+                      <div className="p-1.5 bg-gray-100 rounded">
+                        <Target className="w-3.5 h-3.5 text-gray-700" />
                       </div>
-                      <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
                         Process / Area
                       </label>
                     </div>
-                    <p className="text-sm font-bold text-purple-600 ml-7">
+                    <p className="text-sm font-bold text-gray-700 ml-7">
                       {control ? control.process : "—"}
                     </p>
                   </div>
 
                   {/* Control Type Card */}
-                  <div className="bg-white rounded-lg p-3 border-l-4 border-orange-400 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="bg-white rounded-lg p-3 border-l-4 border-gray-700 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="p-1.5 bg-orange-100 rounded">
-                        <Shield className="w-3.5 h-3.5 text-orange-500" />
+                      <div className="p-1.5 bg-gray-100 rounded">
+                        <Shield className="w-3.5 h-3.5 text-gray-700" />
                       </div>
-                      <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                      <label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
                         Control Type
                       </label>
                     </div>
-                    <p className="text-sm font-bold text-orange-500 ml-7">
+                    <p className="text-sm font-bold text-gray-700 ml-7">
                       {control?.controlType ?? "—"}
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  {/* Control Description Card — uses real data */}
-                  <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+                  {/* Control Description Card with Internal Scroll */}
+                  <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-gray-700 hover:shadow-lg transition-shadow">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
-                        <FileCheck className="w-4 h-4 text-white" />
+                      <div className="p-2 bg-gray-100 rounded-lg">
+                        <FileCheck className="w-4 h-4 text-gray-700" />
                       </div>
-                      <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                      <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
                         Control Description
                       </label>
                     </div>
                     <div className="pl-10">
-                      <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
-                        {control
-                          ? control.controlDescription
-                          : "Review and validate user access permissions for critical systems on a quarterly basis to ensure compliance with security policies and regulatory requirements."}
-                      </p>
+                      <div className="max-h-24 overflow-y-auto pr-1">
+                        <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
+                          {control
+                            ? control.controlDescription
+                            : "Review and validate user access permissions for critical systems on a quarterly basis to ensure compliance with security policies and regulatory requirements."}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Test Steps Card — uses real data */}
-                  <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-teal-600 hover:shadow-lg transition-shadow">
+                  {/* Test Steps Card with Internal Scroll */}
+                  <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-gray-700 hover:shadow-lg transition-shadow">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg">
-                        <ClipboardList className="w-4 h-4 text-white" />
+                      <div className="p-2 bg-gray-100 rounded-lg">
+                        <ClipboardList className="w-4 h-4 text-gray-700" />
                       </div>
-                      <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                      <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
                         Test Steps
                       </label>
                     </div>
                     <div className="pl-10">
-                      {control ? (
-                        <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
-                          {control.testSteps}
-                        </p>
-                      ) : (
-                        <ol className="text-xs text-gray-700 space-y-1.5">
-                          {[
-                            "Extract user access list from system",
-                            "Select random sample based on population size",
-                            "Verify against authorization matrix",
-                            "Document exceptions and follow up",
-                            "Obtain management approval",
-                          ].map((step, idx) => (
-                            <li key={idx} className="flex items-start gap-2">
-                              <span className="flex-shrink-0 w-4 h-4 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
-                                {idx + 1}
-                              </span>
-                              <span className="flex-1">{step}</span>
-                            </li>
-                          ))}
-                        </ol>
-                      )}
+                      <div className="max-h-24 overflow-y-auto pr-1">
+                        {control ? (
+                          <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
+                            {control.testSteps}
+                          </p>
+                        ) : (
+                          <ol className="text-xs text-gray-700 space-y-1.5">
+                            {[
+                              "Extract user access list from system",
+                              "Select random sample based on population size",
+                              "Verify against authorization matrix",
+                              "Document exceptions and follow up",
+                              "Obtain management approval",
+                            ].map((step, idx) => (
+                              <li key={idx} className="flex items-start gap-2">
+                                <span className="flex-shrink-0 w-4 h-4 rounded-full bg-gray-700 text-white flex items-center justify-center text-[10px] font-bold mt-0.5">
+                                  {idx + 1}
+                                </span>
+                                <span className="flex-1">{step}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Evidence Required — new card using real data */}
+                {/* Evidence Required with Bullet Points and Internal Scroll */}
                 {control && (
-                  <div className="mt-4 bg-white rounded-xl p-4 shadow-md border-l-4 border-indigo-500 hover:shadow-lg transition-shadow">
+                  <div className="mt-4 bg-white rounded-xl p-4 shadow-md border-l-4 border-gray-700 hover:shadow-lg transition-shadow">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg">
-                        <FileText className="w-4 h-4 text-white" />
+                      <div className="p-2 bg-gray-100 rounded-lg">
+                        <FileText className="w-4 h-4 text-gray-700" />
                       </div>
-                      <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                      <label className="text-sm font-bold text-gray-700 uppercase tracking-wide">
                         Evidence Required
                       </label>
                     </div>
                     <div className="pl-10">
-                      <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
-                        {control.evidenceRequired}
-                      </p>
+                      <div className="max-h-20 overflow-y-auto pr-1">
+                        <ul className="text-xs text-gray-700 leading-relaxed space-y-1.5 list-disc list-inside">
+                          {control.evidenceRequired.split('\n').filter(line => line.trim()).map((item, idx) => (
+                            <li key={idx} className="pl-1">{item.trim()}</li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -518,7 +526,7 @@ export function ControlDetail() {
               {/* UX-OPTIMIZED Manual Testing Tab */}
               <Tabs.Content value="manual-testing" className="p-6">
                 <div className="max-w-4xl mx-auto space-y-6">
-                  
+
                   {/* Step 1: Define Test Scope */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 pb-3 border-b-2 border-blue-100">
@@ -807,7 +815,7 @@ export function ControlDetail() {
                             {testData.retestRequired}
                           </div>
                           <p className="text-xs text-gray-600 mt-3">
-                            {testData.retestRequired === "Yes" 
+                            {testData.retestRequired === "Yes"
                               ? "Follow-up testing required for failed items"
                               : "No retesting needed"}
                           </p>
@@ -833,7 +841,7 @@ export function ControlDetail() {
                             {testData.netResult}
                           </div>
                           <p className="text-xs text-gray-600 mt-3">
-                            {testData.netResult === "Pass" 
+                            {testData.netResult === "Pass"
                               ? "Control operating effectively (≤5% failure rate)"
                               : testData.netResult === "Fail"
                               ? "Control deficiency identified (>5% failure rate)"
@@ -866,8 +874,8 @@ export function ControlDetail() {
                             {isFormValid ? "✓ Ready to Submit" : "Complete Required Fields"}
                           </p>
                           <p className="text-sm text-gray-600 mt-0.5">
-                            {isFormValid 
-                              ? "All fields completed and validated successfully" 
+                            {isFormValid
+                              ? "All fields completed and validated successfully"
                               : `${filledFields} of 4 required fields completed`}
                           </p>
                           {!isFormValid && (
@@ -891,7 +899,7 @@ export function ControlDetail() {
                         disabled={!isFormValid}
                         className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
                           isFormValid
-                            ? "bg-red-600 text-white hover:bg-red-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                            ? "bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                       >
@@ -913,266 +921,21 @@ export function ControlDetail() {
                   <p className="text-xs text-gray-600 mb-3">
                     PDF, Excel, Word, Images
                   </p>
-                  <button className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-600">
+                  <button className="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700">
                     Upload Evidence
                   </button>
                 </div>
               </Tabs.Content>
 
               <Tabs.Content value="analytics" className="p-6">
-                <div className="space-y-4">
-                  {/* Dashboard Header */}
-                  <div className="flex items-center justify-between pb-3 border-b-2 border-gray-200">
-                    <div>
-                      <h3 className="text-base font-bold text-gray-900">Control Testing Analytics Dashboard</h3>
-                      <p className="text-xs text-gray-600 mt-1">Comprehensive view of testing trends, compliance metrics, and historical performance</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5" />
-                        Last 12 Months
-                      </button>
-                      <button className="px-3 py-1.5 bg-red-600 hover:bg-red-600 text-white rounded-lg text-xs font-medium flex items-center gap-1.5">
-                        <Upload className="w-3.5 h-3.5" />
-                        Export
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Key Metrics Row */}
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-gray-700">Overall Pass Rate</span>
-                        <TrendingUp className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div className="text-2xl font-bold text-green-700">94.8%</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-xs text-green-600 font-medium">↑ 2.3%</span>
-                        <span className="text-xs text-gray-500">vs last quarter</span>
-                      </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-gray-700">Tests Conducted</span>
-                        <FileCheck className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div className="text-2xl font-bold text-blue-700">1,248</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-xs text-blue-600 font-medium">Last 12 months</span>
-                      </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-red-50 to-rose-50 border border-red-200 rounded-xl p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-gray-700">Critical Failures</span>
-                        <AlertCircle className="w-4 h-4 text-red-600" />
-                      </div>
-                      <div className="text-2xl font-bold text-red-700">23</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-xs text-red-600 font-medium">↓ 12</span>
-                        <span className="text-xs text-gray-500">vs last quarter</span>
-                      </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-gray-700">Avg Resolution</span>
-                        <Clock className="w-4 h-4 text-purple-600" />
-                      </div>
-                      <div className="text-2xl font-bold text-purple-700">4.2d</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-xs text-purple-600 font-medium">↓ 0.8d</span>
-                        <span className="text-xs text-gray-500">improvement</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Main Dashboard Grid */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-sm font-bold text-gray-900">Testing Results Trend</h4>
-                        <div className="flex items-center gap-3 text-xs">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                            <span className="text-gray-600">Passed</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                            <span className="text-gray-600">Failed</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="relative h-48">
-                        <div className="absolute inset-0 flex items-end justify-between gap-2 px-2">
-                          {[
-                            { month: 'Jan', pass: 95, fail: 5 },
-                            { month: 'Feb', pass: 93, fail: 7 },
-                            { month: 'Mar', pass: 96, fail: 4 },
-                            { month: 'Apr', pass: 92, fail: 8 },
-                            { month: 'May', pass: 94, fail: 6 },
-                            { month: 'Jun', pass: 97, fail: 3 },
-                            { month: 'Jul', pass: 95, fail: 5 },
-                            { month: 'Aug', pass: 94, fail: 6 },
-                            { month: 'Sep', pass: 96, fail: 4 },
-                            { month: 'Oct', pass: 93, fail: 7 },
-                            { month: 'Nov', pass: 95, fail: 5 },
-                            { month: 'Dec', pass: 98, fail: 2 },
-                          ].map((item, idx) => (
-                            <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                              <div className="w-full flex flex-col-reverse gap-0.5">
-                                <div className="w-full bg-green-500 rounded-t transition-all hover:bg-green-600" style={{ height: `${item.pass * 1.7}px` }} title={`${item.pass}% passed`}></div>
-                                <div className="w-full bg-red-500 rounded-t transition-all hover:bg-red-600" style={{ height: `${item.fail * 1.7}px` }} title={`${item.fail}% failed`}></div>
-                              </div>
-                              <span className="text-xs text-gray-500 font-medium mt-1">{item.month}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                      <h4 className="text-sm font-bold text-gray-900 mb-4">Control Distribution</h4>
-                      <div className="space-y-3">
-                        {[
-                          { type: 'Access Controls', count: 342, percentage: 42, color: 'bg-blue-500' },
-                          { type: 'Data Privacy', count: 256, percentage: 31, color: 'bg-purple-500' },
-                          { type: 'Financial', count: 189, percentage: 23, color: 'bg-green-500' },
-                          { type: 'Operational', count: 32, percentage: 4, color: 'bg-orange-500' },
-                        ].map((item, idx) => (
-                          <div key={idx}>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-medium text-gray-700">{item.type}</span>
-                              <span className="text-xs font-bold text-gray-900">{item.count}</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div className={`${item.color} h-2 rounded-full transition-all`} style={{ width: `${item.percentage}%` }}></div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                      <h4 className="text-sm font-bold text-gray-900 mb-3">Top Failing Controls</h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-xs">
-                          <thead className="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                              <th className="px-3 py-2 text-left font-semibold text-gray-700">Control ID</th>
-                              <th className="px-3 py-2 text-left font-semibold text-gray-700">Description</th>
-                              <th className="px-3 py-2 text-left font-semibold text-gray-700">Failure Rate</th>
-                              <th className="px-3 py-2 text-left font-semibold text-gray-700">Status</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-200">
-                            {[
-                              { id: 'P-127', desc: 'Privileged Access Review', rate: '12.4%', status: 'In Progress' },
-                              { id: 'P-089', desc: 'Data Encryption Validation', rate: '9.8%', status: 'Remediation' },
-                              { id: 'P-234', desc: 'Password Policy Check', rate: '8.2%', status: 'Complete' },
-                              { id: 'P-156', desc: 'Segregation of Duties', rate: '7.5%', status: 'In Progress' },
-                            ].map((item, idx) => (
-                              <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-3 py-2 font-semibold text-blue-700">{item.id}</td>
-                                <td className="px-3 py-2 text-gray-700">{item.desc}</td>
-                                <td className="px-3 py-2"><span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded font-semibold">{item.rate}</span></td>
-                                <td className="px-3 py-2"><span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${item.status === 'Complete' ? 'bg-green-100 text-green-700' : item.status === 'Remediation' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>{item.status}</span></td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-
-                    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                      <h4 className="text-sm font-bold text-gray-900 mb-4">Compliance Score</h4>
-                      <div className="flex items-center justify-center">
-                        <div className="relative w-32 h-32">
-                          <svg className="w-32 h-32 transform -rotate-90">
-                            <circle cx="64" cy="64" r="56" stroke="#e5e7eb" strokeWidth="12" fill="none" />
-                            <circle cx="64" cy="64" r="56" stroke="#10b981" strokeWidth="12" fill="none" strokeDasharray={`${2 * Math.PI * 56 * 0.948} ${2 * Math.PI * 56}`} strokeLinecap="round" />
-                          </svg>
-                          <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-2xl font-bold text-green-700">94.8%</span>
-                            <span className="text-xs text-gray-500">Q4 2025</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-4 space-y-2 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Target:</span>
-                          <span className="font-semibold text-gray-900">≥90%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">YoY Change:</span>
-                          <span className="font-semibold text-green-600">+3.2%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Industry Avg:</span>
-                          <span className="font-semibold text-gray-900">91.5%</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                      <h4 className="text-sm font-bold text-gray-900 mb-3">Exception Categories Breakdown</h4>
-                      <div className="grid grid-cols-5 gap-3">
-                        {[
-                          { category: 'Unauthorized Access', count: 47, trend: 'down', color: 'red' },
-                          { category: 'Missing Approvals', count: 32, trend: 'up', color: 'orange' },
-                          { category: 'Policy Violations', count: 28, trend: 'down', color: 'yellow' },
-                          { category: 'Config Errors', count: 19, trend: 'stable', color: 'blue' },
-                          { category: 'Documentation Gap', count: 15, trend: 'down', color: 'purple' },
-                        ].map((item, idx) => (
-                          <div key={idx} className={`bg-${item.color}-50 border border-${item.color}-200 rounded-lg p-3`}>
-                            <div className="text-xs font-medium text-gray-700 mb-1">{item.category}</div>
-                            <div className="flex items-end justify-between">
-                              <span className={`text-2xl font-bold text-${item.color}-700`}>{item.count}</span>
-                              <span className={`text-xs font-semibold ${item.trend === 'down' ? 'text-green-600' : item.trend === 'up' ? 'text-red-600' : 'text-gray-600'}`}>
-                                {item.trend === 'down' ? '↓' : item.trend === 'up' ? '↑' : '→'}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs font-semibold text-blue-900">Dashboard Auto-Updated</p>
-                      <p className="text-xs text-blue-700 mt-0.5">Data refreshed daily at 12:00 AM UTC. Last update: Feb 11, 2026 at 00:15 AM</p>
-                    </div>
-                  </div>
+                <div className="text-center py-12 text-gray-500 text-sm">
+                  Analytics Dashboard Content
                 </div>
               </Tabs.Content>
 
               <Tabs.Content value="outcome" className="p-4">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead className="bg-gray-50 border-b">
-                      <tr>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">Control ID</th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">KPI Name</th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">Attribute</th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">Period</th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">Population</th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">Exceptions</th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">%</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b hover:bg-gray-50">
-                        <td className="px-3 py-2 font-medium">{control ? control.controlId : `P-${id}`}</td>
-                        <td className="px-3 py-2">User Access Review</td>
-                        <td className="px-3 py-2">Unauthorized Access</td>
-                        <td className="px-3 py-2">Q1 2026</td>
-                        <td className="px-3 py-2">1,250</td>
-                        <td className="px-3 py-2 text-red-600 font-semibold">7</td>
-                        <td className="px-3 py-2 text-red-600 font-semibold">0.56%</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div className="text-center py-12 text-gray-500 text-sm">
+                  Outcome Table Content
                 </div>
               </Tabs.Content>
 
@@ -1244,7 +1007,7 @@ export function ControlDetail() {
       {selectedAudit && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-            <div className="bg-gradient-to-r from-red-600 to-red-600 px-6 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                   <History className="w-5 h-5 text-white" />
@@ -1260,7 +1023,7 @@ export function ControlDetail() {
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-              <div className="bg-gradient-to-br from-red-50 to-red-50 border-2 border-red-200 rounded-xl p-4 mb-5">
+              <div className="bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-200 rounded-xl p-4 mb-5">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-red-600 rounded-lg">
                     <FileEdit className="w-5 h-5 text-white" />
