@@ -1,22 +1,16 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { Eye, EyeOff, ChevronDown } from "lucide-react";
-import toyotaLogo from "../Assets/toyota-logo.png"; // <-- place your 1267.png here as toyota-logo.png
-import bgvideo from "../Assets/login_page.mp4"
-const roles = [
-  "IT Admin",
-  "CC/CG Admin",
-  "Auditor",
-  "Management User",
-  "Reviewer",
-  "Manager",
-  "Auditee",
-] as const;
+import toyotaLogo from "../Assets/toyota-logo.png";
+import bgvideo from "../Assets/login_page.mp4";
+
+const roles = ["Admin", "User"] as const;
 
 type Role = (typeof roles)[number];
 
 export function Login() {
   const navigate = useNavigate();
+
   const [credentials, setCredentials] = useState<{
     username: string;
     password: string;
@@ -26,18 +20,42 @@ export function Login() {
     password: "",
     role: "",
   });
+
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [roleOpen, setRoleOpen] = useState(false);
   const [usernameFocused, setUsernameFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // ✅ Hardcoded Users
+  const validUsers: Record<
+    string,
+    { password: string; role: Role }
+  > = {
+    "admin@gmail.com": { password: "123456", role: "Admin" },
+    "user@gmail.com": { password: "123456", role: "User" },
+  };
+
+  // ✅ Updated Login Logic
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (credentials.role) {
-      localStorage.setItem("userRole", credentials.role);
+
+    const { username, password, role } = credentials;
+
+    const user = validUsers[username];
+
+    if (user && user.password === password && user.role === role) {
+      localStorage.setItem("userRole", role as string);
+
+      if (keepLoggedIn) {
+        localStorage.setItem("isLoggedIn", "true");
+      }
+
       navigate("/dashboard");
+    } else {
+      alert("Invalid username, password, or role");
     }
   };
 
@@ -66,21 +84,19 @@ export function Login() {
           src={toyotaLogo}
           alt="Toyota Logo"
           className="w-64 h-64 object-contain mb-2 drop-shadow-2xl"
-          // style={{ filter: "brightness(0) invert(1)" }}
         />
         <div className="mb-24">
           <h1 className="text-7xl font-bold leading-tight drop-shadow-lg text-center">
-          CAGM
-        </h1>
-        <p className="mt-3 text-xl font-medium text-white/90 drop-shadow text-center">
-          Compliance and Governance Monitoring Tool
-        </p>
+            CAGM
+          </h1>
+          <p className="mt-3 text-xl font-medium text-white/90 drop-shadow text-center">
+            Compliance and Governance Monitoring Tool
+          </p>
         </div>
       </div>
 
       {/* ── LOGIN CARD ── */}
       <div className="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-[460px] px-11 py-12 ">
-        {/* Header */}
         <h2 className="text-4xl font-extrabold text-[#CC0000] text-center mb-1 tracking-tight">
           Welcome
         </h2>

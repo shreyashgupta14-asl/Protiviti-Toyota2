@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, CheckCircle, XCircle, MessageSquare, Upload, Mail } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, MessageSquare, Upload, Mail, X, Calendar, User, Tag, Layers } from "lucide-react";
 import { Link } from "react-router";
 
 interface ApprovalItem {
@@ -166,102 +166,339 @@ const mockApprovals: ApprovalItem[] = [
   },
 ];
 
-// Wave SVG matching the reference — stroke line + soft filled area beneath
-function KpiWave({ color }: { color: string }) {
-  return (
-    <svg
-      className="absolute bottom-0 left-0 w-full"
-      viewBox="0 0 300 56"
-      preserveAspectRatio="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ height: "56px" }}
-    >
-      <defs>
-        <linearGradient id={`waveGrad-${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.22" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.04" />
-        </linearGradient>
-      </defs>
+// ── Level Progress Bar ──────────────────────────────────────────────────────
+function LevelProgressBar({
+  currentLevel,
+  status,
+}: {
+  currentLevel: 1 | 2 | 3;
+  status: "Pending" | "Approved" | "Rejected";
+}) {
+  const levels = ["L1", "L2", "L3"] as const;
 
-      {/* Filled area beneath the wave line */}
-      <path
-        d="M0 32 C20 22, 38 42, 60 30 C78 20, 95 38, 115 28 C135 18, 152 40, 175 28 C195 18, 215 38, 238 26 C258 16, 278 36, 300 24 L300 56 L0 56 Z"
-        fill={`url(#waveGrad-${color.replace("#", "")})`}
-      />
-
-      {/* Back wave line — thinner, more transparent */}
-      <path
-        d="M0 36 C20 26, 38 46, 60 34 C78 24, 95 42, 115 32 C135 22, 152 44, 175 32 C195 22, 215 42, 238 30 C258 20, 278 40, 300 28"
-        fill="none"
-        stroke={color}
-        strokeWidth="1.2"
-        strokeOpacity="0.25"
-        strokeLinecap="round"
-      />
-
-      {/* Front wave line — bolder, matches reference style */}
-      <path
-        d="M0 32 C20 22, 38 42, 60 30 C78 20, 95 38, 115 28 C135 18, 152 40, 175 28 C195 18, 215 38, 238 26 C258 16, 278 36, 300 24"
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeOpacity="0.55"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-export function ApprovalWorkflow() {
-  const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
-  const [comment, setComment] = useState("");
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "High":
-        return "bg-red-100 text-red-700 border-red-300";
-      case "Medium":
-        return "bg-yellow-100 text-yellow-700 border-yellow-300";
-      case "Low":
-        return "bg-gray-100 text-gray-600 border-gray-300";
+  const getNodeStyle = (idx: number): string => {
+    const levelNum = idx + 1;
+    if (status === "Rejected") {
+      if (levelNum < currentLevel) return "bg-green-500 text-white";
+      if (levelNum === currentLevel) return "bg-red-500 text-white";
+      return "bg-gray-200 text-gray-400";
     }
+    if (status === "Approved") return "bg-green-500 text-white";
+    if (levelNum < currentLevel) return "bg-green-500 text-white";
+    if (levelNum === currentLevel) return "bg-orange-500 text-white";
+    return "bg-gray-200 text-gray-400";
+  };
+
+  const getConnectorStyle = (idx: number): string => {
+    const nextLevel = idx + 2;
+    if (status === "Approved") return "bg-green-500";
+    if (status === "Rejected" && nextLevel <= currentLevel) return "bg-green-500";
+    if (nextLevel <= currentLevel && status === "Pending") return "bg-green-500";
+    return "bg-gray-200";
   };
 
   return (
-    <div className="h-screen flex flex-col p-4 sm:p-6 gap-4 overflow-hidden">
-      {/* Approval Queue Stats - Enhanced with waves */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl shadow-md p-5 border-l-4 border-orange-500 hover:shadow-lg transition-all relative overflow-hidden">
-          <p className="text-xs font-semibold text-orange-700 mb-1 relative z-10">Pending L1</p>
-          <p className="text-3xl font-bold text-orange-800 relative z-10">12</p>
-          <KpiWave color="#f97316" />
+    <div className="flex items-center gap-0">
+      {levels.map((label, idx) => (
+        <div key={label} className="flex items-center">
+          <div
+            className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm transition-all ${getNodeStyle(idx)}`}
+          >
+            {label}
+          </div>
+          {idx < 2 && (
+            <div className={`w-6 h-1 rounded-full transition-all ${getConnectorStyle(idx)}`} />
+          )}
         </div>
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md p-5 border-l-4 border-blue-500 hover:shadow-lg transition-all relative overflow-hidden">
-          <p className="text-xs font-semibold text-blue-700 mb-1 relative z-10">Pending L2</p>
-          <p className="text-3xl font-bold text-blue-800 relative z-10">8</p>
-          <KpiWave color="#3b82f6" />
+      ))}
+    </div>
+  );
+}
+
+// ── Priority Badge ─────────────────────────────────────────────────────────
+function PriorityBadge({ priority }: { priority: ApprovalItem["priority"] }) {
+  const styles = {
+    High: "bg-red-100 text-red-700 border-red-200",
+    Medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    Low: "bg-green-100 text-green-700 border-green-200",
+  };
+  return (
+    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${styles[priority]}`}>
+      {priority}
+    </span>
+  );
+}
+
+// ── Status Badge ───────────────────────────────────────────────────────────
+function StatusBadge({ status }: { status: ApprovalItem["status"] }) {
+  const styles = {
+    Pending: "bg-orange-100 text-orange-700 border-orange-200",
+    Approved: "bg-green-100 text-green-700 border-green-200",
+    Rejected: "bg-red-100 text-red-700 border-red-200",
+  };
+  return (
+    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${styles[status]}`}>
+      {status}
+    </span>
+  );
+}
+
+// ── Detail Modal ───────────────────────────────────────────────────────────
+function DetailModal({
+  item,
+  onClose,
+}: {
+  item: ApprovalItem;
+  onClose: () => void;
+}) {
+  const levelApprovers = ["Michael Chen", "Sarah Johnson", "James Director"];
+
+  return (
+    // Backdrop
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      {/* Modal Panel */}
+      <div
+        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-gradient-to-br from-red-600 to-red-800 rounded-t-2xl px-6 py-4 flex items-start justify-between">
+          <div>
+            <p className="text-orange-100 text-xs font-medium uppercase tracking-widest mb-1">
+              Control Detail
+            </p>
+            <h2 className="text-white text-xl font-bold">{item.controlId}</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-1.5 transition-colors mt-0.5"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md p-5 border-l-4 border-purple-500 hover:shadow-lg transition-all relative overflow-hidden">
-          <p className="text-xs font-semibold text-purple-700 mb-1 relative z-10">Pending L3</p>
-          <p className="text-3xl font-bold text-purple-800 relative z-10">5</p>
-          <KpiWave color="#a855f7" />
-        </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-5 border-l-4 border-green-500 hover:shadow-lg transition-all relative overflow-hidden">
-          <p className="text-xs font-semibold text-green-700 mb-1 relative z-10">Approved Today</p>
-          <p className="text-3xl font-bold text-green-800 relative z-10">14</p>
-          <KpiWave color="#22c55e" />
+
+        <div className="p-6 space-y-6">
+          {/* Description */}
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Description</p>
+            <p className="text-sm text-gray-800 leading-relaxed">{item.description}</p>
+          </div>
+
+          {/* Key Details Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <User className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Submitted By</p>
+                <p className="text-sm font-semibold text-gray-800">{item.submittedBy}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <Calendar className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Submitted Date</p>
+                <p className="text-sm font-semibold text-gray-800">{item.submittedDate}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <Tag className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Priority</p>
+                <div className="mt-1">
+                  <PriorityBadge priority={item.priority} />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <Layers className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Status</p>
+                <div className="mt-1">
+                  <StatusBadge status={item.status} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Approval Workflow */}
+          <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-2 border-orange-200">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm font-semibold text-gray-800">Approval Workflow</p>
+              <span className="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
+                Current Level: L{item.currentLevel}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {([1, 2, 3] as const).map((lvl) => {
+                let nodeStyle = "bg-gray-200 text-gray-400";
+                let label = `L${lvl}`;
+                let statusText = "Not reached";
+                let statusClass = "text-gray-400";
+
+                if (item.status === "Approved") {
+                  nodeStyle = "bg-green-500 text-white";
+                  statusText = `Approved by ${levelApprovers[lvl - 1]}`;
+                  statusClass = "text-green-600";
+                  label = "✓";
+                } else if (item.status === "Rejected" && lvl === item.currentLevel) {
+                  nodeStyle = "bg-red-500 text-white";
+                  statusText = `Rejected by ${levelApprovers[lvl - 1]}`;
+                  statusClass = "text-red-600";
+                } else if (lvl < item.currentLevel) {
+                  nodeStyle = "bg-green-500 text-white";
+                  statusText = `Approved by ${levelApprovers[lvl - 1]}`;
+                  statusClass = "text-green-600";
+                  label = "✓";
+                } else if (lvl === item.currentLevel && item.status === "Pending") {
+                  nodeStyle = "bg-orange-500 text-white";
+                  statusText = `Awaiting ${levelApprovers[lvl - 1]}`;
+                  statusClass = "text-orange-600";
+                }
+
+                return (
+                  <div key={lvl} className="flex items-center gap-3">
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shadow-sm flex-shrink-0 ${nodeStyle}`}
+                    >
+                      {label}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-gray-700">Level {lvl} — {levelApprovers[lvl - 1]}</p>
+                      <p className={`text-xs ${statusClass}`}>{statusText}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Attached Evidence */}
+          <div>
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+              <Upload className="w-4 h-4 text-gray-500" />
+              Attached Evidence
+            </h3>
+            <div className="space-y-2">
+              {["User_Access_Report_Q1_2026.xlsx", "Exception_Analysis.pdf"].map((file, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                >
+                  <span className="text-sm text-gray-700">{file}</span>
+                  <button className="text-xs text-orange-600 hover:text-orange-700 font-medium">
+                    Download
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Email Notifications */}
+          <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+            <div className="flex items-center gap-2 mb-3">
+              <Mail className="w-4 h-4 text-gray-500" />
+              <h3 className="text-sm font-semibold text-gray-700">Email Notifications</h3>
+            </div>
+            <div className="space-y-2 text-xs text-gray-600">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                <span>Control owner will be notified upon approval/rejection</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                <span>Next level approver will be notified upon approval</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                <span>Audit team will receive a copy of final decision</span>
+              </div>
+            </div>
+          </div>
+
+
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Approval Queue - Enhanced with Fixed Height and Internal Scroll */}
+// ── Stage config ──────────────────────────────────────────────────────────
+interface StageConfig {
+  label: string;
+  value: number;
+  gradient: string;
+  glowColor: string;
+  connectorGradient: string;
+}
+
+// ── KPI Progress Bar ───────────────────────────────────────────────────────
+function ApprovalProgressBar() {
+  const pendingL1 = mockApprovals.filter((a) => a.currentLevel === 1 && a.status === "Pending").length;
+  const pendingL2 = mockApprovals.filter((a) => a.currentLevel === 2 && a.status === "Pending").length;
+  const pendingL3 = mockApprovals.filter((a) => a.currentLevel === 3 && a.status === "Pending").length;
+  const approvedToday = mockApprovals.filter((a) => a.status === "Approved").length;
+
+  const stages: StageConfig[] = [
+    { label: "Pending L1", value: pendingL1, gradient: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)", glowColor: "#3b82f6", connectorGradient: "linear-gradient(90deg, #3b82f6, #f59e0b)" },
+    { label: "Pending L2", value: pendingL2, gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", glowColor: "#f59e0b", connectorGradient: "linear-gradient(90deg, #f59e0b, #8b5cf6)" },
+    { label: "Pending L3", value: pendingL3, gradient: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)", glowColor: "#8b5cf6", connectorGradient: "linear-gradient(90deg, #8b5cf6, #10b981)" },
+    { label: "Approved Today", value: approvedToday, gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)", glowColor: "#10b981", connectorGradient: "" },
+  ];
+
+  return (
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 px-6 py-4 flex-shrink-0">
+      <div className="flex items-center justify-center">
+        {stages.map((stage, i) => (
+          <div key={i} className="flex items-center">
+            <div className="flex flex-col items-center">
+              <div className="relative flex items-center justify-center">
+                <span className="absolute w-14 h-14 rounded-full opacity-15 animate-pulse" style={{ background: `radial-gradient(circle, ${stage.glowColor}, transparent)` }} />
+                <div className="relative w-10 h-10 rounded-full flex items-center justify-center shadow-md text-white" style={{ background: stage.gradient }}>
+                  <span className="text-base font-bold leading-none">{stage.value}</span>
+                </div>
+              </div>
+              <p className="text-xs font-semibold text-gray-600 mt-2 text-center whitespace-nowrap">{stage.label}</p>
+            </div>
+            {i < stages.length - 1 && (
+              <div className="w-16 mx-2 mb-5">
+                <div className="h-0.5 w-full rounded-full" style={{ background: stage.connectorGradient }} />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
+export function ApprovalWorkflow() {
+  const [selectedItem, setSelectedItem] = useState<ApprovalItem | null>(null);
+  const [modalItem, setModalItem] = useState<ApprovalItem | null>(null);
+  const [comment, setComment] = useState("");
+
+  return (
+    <div className="h-screen flex flex-col p-4 sm:p-6 gap-4 overflow-hidden">
+      {/* Detail Modal */}
+      {modalItem && (
+        <DetailModal item={modalItem} onClose={() => setModalItem(null)} />
+      )}
+
+      {/* KPI Progress Bar */}
+      <ApprovalProgressBar />
+
+      {/* Approval Queue Table */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex-1 flex flex-col min-h-0">
         <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex-shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-gray-800">Pending Approvals</h2>
               <p className="text-xs text-gray-600 mt-1">
-                {mockApprovals.filter((a) => a.status === "Pending").length}{" "}
-                items awaiting review
+                {mockApprovals.filter((a) => a.status === "Pending").length} items awaiting review
               </p>
             </div>
             <div className="relative w-full sm:w-72">
@@ -269,128 +506,58 @@ export function ApprovalWorkflow() {
               <input
                 type="text"
                 placeholder="Search approvals..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent shadow-sm"
               />
             </div>
           </div>
         </div>
 
-        {/* Table Container with Fixed Height and Internal Scrolling */}
+        {/* Table */}
         <div className="overflow-x-auto overflow-y-auto flex-1">
-          <table className="w-full min-w-[900px]">
+          <table className="w-full min-w-[700px]">
             <thead className="bg-gradient-to-r from-gray-100 to-gray-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">
-                  Control ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">
-                  Description
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">
-                  Submitted By
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">
-                  Level
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">
-                  Priority
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-bold text-gray-700">
-                  Actions
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">Control ID</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">Description</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">Submitted By</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700">Status</th>
+                <th className="px-6 py-3 text-center text-xs font-bold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {mockApprovals.map((item) => (
                 <tr
                   key={item.id}
-                  className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 cursor-pointer transition-all"
-                  onClick={() => setSelectedItem(item)}
+                  className="hover:bg-gradient-to-r hover:from-orange-50/40 hover:to-amber-50/40 transition-all"
                 >
-                  <td className="px-6 py-4 text-xs font-bold text-gray-800">
-                    {item.controlId}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {item.description}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {item.submittedBy}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {item.submittedDate}
-                  </td>
+                  <td className="px-6 py-4 text-xs font-bold text-gray-800">{item.controlId}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">{item.description}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.submittedBy}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.submittedDate}</td>
                   <td className="px-6 py-4">
-                    <div className="flex gap-1">
-                      <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm ${
-                          item.currentLevel >= 1
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-300 text-gray-600"
-                        }`}
-                      >
-                        L1
-                      </div>
-                      <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm ${
-                          item.currentLevel >= 2
-                            ? item.status === "Pending"
-                              ? "bg-gray-300 text-gray-600"
-                              : "bg-green-500 text-white"
-                            : "bg-gray-300 text-gray-600"
-                        }`}
-                      >
-                        L2
-                      </div>
-                      <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm ${
-                          item.currentLevel >= 3
-                            ? item.status === "Pending"
-                              ? "bg-gray-300 text-gray-600"
-                              : "bg-green-500 text-white"
-                            : "bg-gray-300 text-gray-600"
-                        }`}
-                      >
-                        L3
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-3 py-1 rounded-lg text-xs border font-semibold shadow-sm ${getPriorityColor(
-                        item.priority
-                      )}`}
-                    >
-                      {item.priority}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-3 py-1 rounded-lg text-xs border font-semibold shadow-sm ${
-                        item.status === "Approved"
-                          ? "bg-green-100 text-green-700 border-green-300"
-                          : item.status === "Rejected"
-                          ? "bg-red-100 text-red-700 border-red-300"
-                          : "bg-yellow-100 text-yellow-700 border-yellow-300"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
+                    <LevelProgressBar currentLevel={item.currentLevel} status={item.status} />
+                    <p className="text-[10px] text-gray-400 mt-1 ml-0.5">
+                      {item.status === "Approved"
+                        ? "All levels approved"
+                        : item.status === "Rejected"
+                        ? `Rejected at L${item.currentLevel}`
+                        : `Awaiting L${item.currentLevel} approval`}
+                    </p>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <Link
-                        to={`/control/${item.id}`}
-                        className="p-2 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-200"
-                        onClick={(e) => e.stopPropagation()}
+                      {/* Eye icon → opens Detail Modal */}
+                      <button
+                        className="p-2 hover:bg-orange-50 rounded-lg transition-colors border border-transparent hover:border-orange-200"
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent row click
+                          setModalItem(item);
+                        }}
+                        title="View details"
                       >
                         <Eye className="w-4 h-4 text-gray-500" />
-                      </Link>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -400,7 +567,7 @@ export function ApprovalWorkflow() {
         </div>
       </div>
 
-      {/* Approval Detail Panel - Enhanced */}
+      {/* Approval Detail Panel (row click) */}
       {selectedItem && (
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 flex-shrink-0 max-h-[50vh] overflow-y-auto">
           <div className="flex items-start justify-between mb-6">
@@ -418,20 +585,18 @@ export function ApprovalWorkflow() {
             </button>
           </div>
 
-          {/* Workflow Progress - Enhanced */}
-          <div className="mb-6 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl shadow-sm">
+          {/* Workflow Progress */}
+          <div className="mb-6 p-5 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 rounded-xl shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-semibold text-gray-800">Workflow Progress</span>
-              <span className="text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
                 Current Level: L{selectedItem.currentLevel}
               </span>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                    ✓
-                  </div>
+                  <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-bold shadow-md">✓</div>
                   <div>
                     <p className="text-xs font-semibold text-gray-800">Level 1 Approved</p>
                     <p className="text-xs text-gray-600">by Michael Chen</p>
@@ -440,41 +605,18 @@ export function ApprovalWorkflow() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ${
-                      selectedItem.currentLevel >= 2
-                        ? selectedItem.status === "Pending"
-                          ? "bg-blue-500 text-white"
-                          : "bg-green-500 text-white"
-                        : "bg-gray-300 text-gray-600"
-                    }`}
-                  >
-                    {selectedItem.currentLevel >= 2 &&
-                    selectedItem.status === "Approved"
-                      ? "✓"
-                      : "L2"}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ${selectedItem.currentLevel >= 2 ? selectedItem.status === "Pending" ? "bg-orange-500 text-white" : "bg-green-500 text-white" : "bg-gray-300 text-gray-600"}`}>
+                    {selectedItem.currentLevel >= 2 && selectedItem.status === "Approved" ? "✓" : "L2"}
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-gray-800">
-                      {selectedItem.currentLevel === 2 ? "Pending L2" : "Level 2"}
-                    </p>
+                    <p className="text-xs font-semibold text-gray-800">{selectedItem.currentLevel === 2 ? "Pending L2" : "Level 2"}</p>
                     <p className="text-xs text-gray-600">Awaiting Sarah Johnson</p>
                   </div>
                 </div>
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ${
-                      selectedItem.currentLevel >= 3
-                        ? selectedItem.status === "Pending"
-                          ? "bg-blue-500 text-white"
-                          : "bg-green-500 text-white"
-                        : "bg-gray-300 text-gray-600"
-                    }`}
-                  >
-                    L3
-                  </div>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ${selectedItem.currentLevel >= 3 ? selectedItem.status === "Pending" ? "bg-orange-500 text-white" : "bg-green-500 text-white" : "bg-gray-300 text-gray-600"}`}>L3</div>
                   <div>
                     <p className="text-xs font-semibold text-gray-800">Level 3</p>
                     <p className="text-xs text-gray-600">Final Approval</p>
@@ -484,23 +626,17 @@ export function ApprovalWorkflow() {
             </div>
           </div>
 
-          {/* Action Buttons - Enhanced */}
+          {/* Action Buttons */}
           {selectedItem.status === "Pending" && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <button className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-4 py-3 rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg">
-                <CheckCircle className="w-5 h-5" />
-                Approve
+                <CheckCircle className="w-5 h-5" />Approve
               </button>
               <button className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white px-4 py-3 rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg">
-                <XCircle className="w-5 h-5" />
-                Reject
+                <XCircle className="w-5 h-5" />Reject
               </button>
-              <Link
-                to={`/control/${selectedItem.id}`}
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white px-4 py-3 rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg"
-              >
-                <Eye className="w-5 h-5" />
-                View Details
+              <Link to={`/control/${selectedItem.id}`} className="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white px-4 py-3 rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg">
+                <Eye className="w-5 h-5" />View Details
               </Link>
             </div>
           )}
@@ -508,13 +644,12 @@ export function ApprovalWorkflow() {
           {/* Comment Box */}
           <div className="mb-6">
             <label className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-              <MessageSquare className="w-4 h-4" />
-              Comments
+              <MessageSquare className="w-4 h-4" />Comments
             </label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="w-full h-32 px-4 py-3 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+              className="w-full h-32 px-4 py-3 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent resize-none"
               placeholder="Enter approval comments or reasons for rejection..."
             />
           </div>
@@ -522,46 +657,28 @@ export function ApprovalWorkflow() {
           {/* Evidence Files */}
           <div className="mb-6">
             <h3 className="flex items-center gap-2 text-sm text-gray-700 mb-3">
-              <Upload className="w-4 h-4" />
-              Attached Evidence
+              <Upload className="w-4 h-4" />Attached Evidence
             </h3>
             <div className="space-y-2">
-              {[
-                "User_Access_Report_Q1_2026.xlsx",
-                "Exception_Analysis.pdf",
-              ].map((file, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200"
-                >
+              {["User_Access_Report_Q1_2026.xlsx", "Exception_Analysis.pdf"].map((file, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
                   <span className="text-sm text-gray-700">{file}</span>
-                  <button className="text-xs text-red-600 hover:text-red-700">
-                    Download
-                  </button>
+                  <button className="text-xs text-orange-600 hover:text-orange-700">Download</button>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Email Trigger Indicators */}
+          {/* Email Notifications */}
           <div className="p-4 bg-gray-50 border border-gray-200 rounded">
             <div className="flex items-center gap-2 mb-3">
               <Mail className="w-4 h-4 text-gray-600" />
               <h3 className="text-sm text-gray-700">Email Notifications</h3>
             </div>
             <div className="space-y-2 text-xs text-gray-600">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span>Control owner will be notified upon approval/rejection</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span>Next level approver will be notified upon approval</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span>Audit team will receive a copy of final decision</span>
-              </div>
+              <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500" /><span>Control owner will be notified upon approval/rejection</span></div>
+              <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500" /><span>Next level approver will be notified upon approval</span></div>
+              <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500" /><span>Audit team will receive a copy of final decision</span></div>
             </div>
           </div>
         </div>

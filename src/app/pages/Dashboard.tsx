@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Filter, Search } from "lucide-react";
 
 type ControlType = "Manual" | "Automatic" | null;
+type ControlTypeFilter = "All" | "Manual" | "Automatic";
 
 interface Control {
   id: string;
@@ -25,8 +26,11 @@ export function Dashboard() {
     subProcess: "All",
     outcome: "All",
     period: "All",
+    controlTypeFilter: "All" as ControlTypeFilter,
   });
 
+  // FIX: controlType is now pre-assigned (even index = Manual, odd = Automatic)
+  // so the filter toggle actually returns results
   const [controls, setControls] = useState<Control[]>([
     {
       id: "001",
@@ -40,7 +44,7 @@ export function Dashboard() {
         "Check the policy is adequate and process performed as per policy\nTraining is provided to new members in the team",
       evidenceRequired:
         "1. Inventory Valuation Policy\n2. SOP for receipt of goods - Imports and Local parts\n3. Training Manuals and documents",
-      controlType: null,
+      controlType: "Manual", // index 0 → even → Manual
     },
     {
       id: "002",
@@ -54,7 +58,7 @@ export function Dashboard() {
         "A. Confirm that following activities are performed by a personnel independently, and approved by the respective managements;\n- production planning,\n- purchase order,\n- receipt and inspection of materials,\n- recording to the inventory sub-ledger, and\n- correction of the records.\n\nB. Confirm that there is no common access provided to personnel who does PO/ BPO and personnel who perform GRN creation.",
       evidenceRequired:
         "1. Authorization Matrix - CLED, Impex and Purchase\n2. System Generated SAP Access Rights Report\n3. Organization Chart -Purchase and CLED\n4. Production Plan\n5. Purchase Order\n6. GRN",
-      controlType: null,
+      controlType: "Automatic", // index 1 → odd → Automatic
     },
     {
       id: "003",
@@ -68,7 +72,7 @@ export function Dashboard() {
         "A. Confirm that each team member having SAP access is registered as user with specific profile and their access is secured through unique user ID and password.",
       evidenceRequired:
         "1. SAP Access Login Screenshot\n2. Authorization Matrix - Purchase and CLED\n3. System Generated SAP Access Rights Report\n4. Organization Chart- Purchase division, CLED and Impex",
-      controlType: null,
+      controlType: "Manual", // index 2 → even → Manual
     },
     {
       id: "004",
@@ -82,7 +86,7 @@ export function Dashboard() {
         "A. Confirm that the SAP EBS access provided to each team member is as per their job profile based on authorization matrix.",
       evidenceRequired:
         "1. SAP Access Login Screenshot\n2. Authorization Matrix - CLED.\n3. System Generated SAP Access Rights Report\n4. Organization Chart- CLED",
-      controlType: null,
+      controlType: "Automatic", // index 3 → odd → Automatic
     },
     {
       id: "005",
@@ -96,7 +100,7 @@ export function Dashboard() {
         "A. Confirm there are manual and SOP in place which provides detailed guideline on receiving and documentation procedures.",
       evidenceRequired:
         "1. SOP for receipt of GPS, Imports and Local parts\n2. Training manuals for GRN 3. Training Records",
-      controlType: null,
+      controlType: "Manual", // index 4 → even → Manual
     },
     {
       id: "006",
@@ -109,7 +113,7 @@ export function Dashboard() {
       testSteps: "To be tested for design adequacy",
       evidenceRequired:
         "1. RTV Screen shot\n2. Debit note screenshots\n3. SAP Screenshot of vendor account",
-      controlType: null,
+      controlType: "Automatic", // index 5 → odd → Automatic
     },
     {
       id: "007",
@@ -123,7 +127,7 @@ export function Dashboard() {
         "A. Confirm that the shipping data from SAL system is automatically used by SAP to create AR invoice.",
       evidenceRequired:
         "1. Screenshot of interface between SAP and SAL\n2. Fund Receipt Report Summary for the period",
-      controlType: null,
+      controlType: "Manual", // index 6 → even → Manual
     },
     {
       id: "008",
@@ -137,7 +141,7 @@ export function Dashboard() {
         "A. Confirm that the shipment is confirmed with purchase order or shipping order data.",
       evidenceRequired:
         "1. Fund receipt report summary\n2. Customer Acknowledgment (New Vehicle receipt Report - NVRR)",
-      controlType: null,
+      controlType: "Automatic", // index 7 → odd → Automatic
     },
     {
       id: "009",
@@ -151,7 +155,7 @@ export function Dashboard() {
         "A. Confirm that PAD identifies, segregates and prepares list of items to be scrapped and the disposal is approved by management.",
       evidenceRequired:
         "1.Inventory Valuation Policy\n2. Inventory write-off / Disposal approval",
-      controlType: null,
+      controlType: "Manual", // index 8 → even → Manual
     },
     {
       id: "010",
@@ -165,13 +169,12 @@ export function Dashboard() {
         "A. Confirm that physical stock count of inventories at all locations are carried out periodically.",
       evidenceRequired:
         "1.Inventory Tags\n2.Inventory System valuation Report\n3.Inventory Valuation Summary",
-      controlType: null,
+      controlType: "Automatic", // index 9 → odd → Automatic
     },
   ]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Toggles the control type AND navigates to detail with the updated state
   const handleControlTypeToggle = (
     id: string,
     type: ControlType,
@@ -187,7 +190,6 @@ export function Dashboard() {
           : c
       );
 
-      // Navigate with the already-updated control so detail page sees the new controlType
       const updatedControl = updated.find((c) => c.id === id);
       if (updatedControl) {
         navigate(`/control/${id}`, { state: { control: updatedControl } });
@@ -199,13 +201,18 @@ export function Dashboard() {
 
   const filteredControls = controls.filter((control) => {
     const q = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       !q ||
       control.controlId.toLowerCase().includes(q) ||
       control.controlDescription.toLowerCase().includes(q) ||
       control.process.toLowerCase().includes(q) ||
-      control.department.toLowerCase().includes(q)
-    );
+      control.department.toLowerCase().includes(q);
+
+    const matchesControlType =
+      filters.controlTypeFilter === "All" ||
+      control.controlType === filters.controlTypeFilter;
+
+    return matchesSearch && matchesControlType;
   });
 
   return (
@@ -213,7 +220,7 @@ export function Dashboard() {
       {/* Filter Bar */}
       <div className="bg-white rounded-xl shadow-md p-5 border border-gray-200 flex-shrink-0">
         <div className="flex items-center gap-2 mb-4">
-          <div className="p-2 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg">
+          <div className="p-2 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg">
             <Filter className="w-4 h-4 text-white" />
           </div>
           <h2 className="text-sm font-semibold text-gray-800">Filters</h2>
@@ -243,7 +250,9 @@ export function Dashboard() {
             </label>
             <select
               value={filters.process}
-              onChange={(e) => setFilters({ ...filters, process: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, process: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
             >
               <option>All</option>
@@ -275,33 +284,57 @@ export function Dashboard() {
 
           <div className="flex-1 min-w-[140px]">
             <label className="block text-xs font-medium text-gray-700 mb-1.5">
-              Outcome
-            </label>
-            <select
-              value={filters.outcome}
-              onChange={(e) => setFilters({ ...filters, outcome: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
-            >
-              <option>All</option>
-              <option>Completed</option>
-              <option>In Progress</option>
-              <option>Not Started</option>
-            </select>
-          </div>
-
-          <div className="flex-1 min-w-[140px]">
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">
               Period
             </label>
             <select
               value={filters.period}
-              onChange={(e) => setFilters({ ...filters, period: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, period: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
             >
               <option>All</option>
               <option>Yes</option>
               <option>No</option>
             </select>
+          </div>
+
+          {/* Beautiful Curved Control Type Toggle */}
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs font-medium text-gray-700 mb-1.5">
+              Control Type
+            </label>
+            <div className="relative flex items-center bg-gray-100 rounded-full p-1 shadow-inner border border-gray-200">
+              {/* Sliding pill indicator */}
+              <div
+                className={`absolute top-1 bottom-1 rounded-full shadow-md transition-all duration-300 ease-in-out ${
+                  filters.controlTypeFilter === "All"
+                    ? "left-1 w-[calc(33.33%-2px)] bg-white"
+                    : filters.controlTypeFilter === "Manual"
+                    ? "left-[calc(33.33%+1px)] w-[calc(33.33%-2px)] bg-gradient-to-r from-red-500 to-red-600"
+                    : "left-[calc(66.66%+1px)] w-[calc(33.33%-2px)] bg-gradient-to-r from-gray-600 to-gray-700"
+                }`}
+              />
+              {(["All", "Manual", "Automatic"] as ControlTypeFilter[]).map(
+                (type) => (
+                  <button
+                    key={type}
+                    onClick={() =>
+                      setFilters({ ...filters, controlTypeFilter: type })
+                    }
+                    className={`relative z-10 flex-1 text-xs font-semibold py-1.5 rounded-full transition-all duration-300 ${
+                      filters.controlTypeFilter === type
+                        ? type === "All"
+                          ? "text-gray-800"
+                          : "text-white"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {type}
+                  </button>
+                )
+              )}
+            </div>
           </div>
 
           <div className="flex gap-2">
@@ -316,6 +349,7 @@ export function Dashboard() {
                   subProcess: "All",
                   outcome: "All",
                   period: "All",
+                  controlTypeFilter: "All",
                 })
               }
               className="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg text-xs font-semibold transition-all shadow-md hover:shadow-lg"
@@ -349,7 +383,7 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="overflow-auto flex-1 min-h-0 rounded-xl">
+        <div className="overflow-auto flex-1 min-h-0">
           <table className="w-full min-w-[1100px]">
             <thead className="bg-gradient-to-r from-gray-100 to-gray-50 border-b border-gray-200 sticky top-0 z-10">
               <tr>
@@ -380,97 +414,81 @@ export function Dashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredControls.map((control, index) => {
-                const assignedType: ControlType =
-                  index % 2 === 0 ? "Manual" : "Automatic";
+              {filteredControls.map((control) => (
+                <tr
+                  key={control.id}
+                  className="hover:bg-gradient-to-r hover:from-red-50/50 hover:to-orange-50/50 transition-all align-top"
+                >
+                  <td className="px-4 py-3">
+                    <span className="text-xs text-gray-600 font-medium">
+                      {control.serialNo}
+                    </span>
+                  </td>
 
-                return (
-                  <tr
-                    key={control.id}
-                    className="hover:bg-gradient-to-r hover:from-red-50/50 hover:to-orange-50/50 transition-all align-top"
-                  >
-                    {/* Sr. No */}
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-gray-600 font-medium">
-                        {control.serialNo}
+                  <td className="px-4 py-3">
+                    <span className="text-xs text-gray-700">
+                      {control.department}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <span className="text-xs text-gray-700">
+                      {control.process}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <span className="text-xs font-bold text-gray-800">
+                      {control.controlId}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 max-w-xs">
+                    <span className="text-xs text-gray-700 whitespace-pre-line line-clamp-4">
+                      {control.controlDescription}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 max-w-xs">
+                    <span className="text-xs text-gray-700 whitespace-pre-line line-clamp-4">
+                      {control.testSteps}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 max-w-xs">
+                    <span className="text-xs text-gray-700 whitespace-pre-line line-clamp-4">
+                      {control.evidenceRequired}
+                    </span>
+                  </td>
+
+                  {/* Control Type button — color driven by control.controlType in state */}
+                  <td className="px-4 py-3">
+                    {control.controlType === "Manual" ? (
+                      <button
+                        onClick={(e) =>
+                          handleControlTypeToggle(control.id, "Manual", e)
+                        }
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm bg-gradient-to-r from-red-600 to-red-500 text-white border-red-600 hover:from-red-700 hover:to-red-600"
+                      >
+                        Manual
+                      </button>
+                    ) : control.controlType === "Automatic" ? (
+                      <button
+                        onClick={(e) =>
+                          handleControlTypeToggle(control.id, "Automatic", e)
+                        }
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm bg-gradient-to-r from-gray-600 to-gray-700 text-white border-gray-600 hover:from-gray-700 hover:to-gray-800"
+                      >
+                        Automatic
+                      </button>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">
+                        Unassigned
                       </span>
-                    </td>
-
-                    {/* Department */}
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-gray-700">
-                        {control.department}
-                      </span>
-                    </td>
-
-                    {/* Process / Area */}
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-gray-700">
-                        {control.process}
-                      </span>
-                    </td>
-
-                    {/* Control ID */}
-                    <td className="px-4 py-3">
-                      <span className="text-xs font-bold text-gray-800">
-                        {control.controlId}
-                      </span>
-                    </td>
-
-                    {/* Control Description */}
-                    <td className="px-4 py-3 max-w-xs">
-                      <span className="text-xs text-gray-700 whitespace-pre-line line-clamp-4">
-                        {control.controlDescription}
-                      </span>
-                    </td>
-
-                    {/* Test Steps */}
-                    <td className="px-4 py-3 max-w-xs">
-                      <span className="text-xs text-gray-700 whitespace-pre-line line-clamp-4">
-                        {control.testSteps}
-                      </span>
-                    </td>
-
-                    {/* Evidence Required */}
-                    <td className="px-4 py-3 max-w-xs">
-                      <span className="text-xs text-gray-700 whitespace-pre-line line-clamp-4">
-                        {control.evidenceRequired}
-                      </span>
-                    </td>
-
-                    {/* Control Type */}
-                    <td className="px-4 py-3">
-                      {assignedType === "Manual" ? (
-                        <button
-                          onClick={(e) =>
-                            handleControlTypeToggle(control.id, "Manual", e)
-                          }
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm bg-gradient-to-r from-red-600 to-red-500 text-white border-red-600${
-                            control.controlType === "Manual"
-                              ? "bg-gradient-to-r from-red-600 to-red-500 text-white border-red-600 shadow-md"
-                              : ""
-                          }`}
-                        >
-                          Manual
-                        </button>
-                      ) : (
-                        <button
-                          onClick={(e) =>
-                            handleControlTypeToggle(control.id, "Automatic", e)
-                          }
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm bg-gray-700  text-white shadow-md${
-                            control.controlType === "Automatic"
-                              ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white border-orange-500 shadow-md"
-                              : ""
-                          }`}
-                        >
-                          Automatic
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
